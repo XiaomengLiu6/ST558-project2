@@ -2,29 +2,18 @@
 title: "project2"
 author: "Xiaomeng Liu"
 date: "2023-10-04"
-output: html_document
+output: github_document
+        #rmarkdown::render(README.md)
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+# overall goal\
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+Our goal with this project is to create a vignette about contacting an API using functions you’ve created to
+query, parse, and return well-structured data. You’ll then use your functions to obtain data from the API and
+do some exploratory data analysis. This is an individual project and your work will be done in a github repo.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+# Setting up your Github Repo
