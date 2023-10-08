@@ -19,6 +19,7 @@ do some exploratory data analysis. This is an individual project and your work w
 
 
 # Vignette Content Details
+# requirement
 
 ## write functions to contact your chosen API and return 
 
@@ -28,8 +29,9 @@ library(tidyverse) ; library(httr) ; library(jsonlite)
 
 ## Fucntions to interact with the API
 
+### create a function for basic url generation 
 ```{r}
-# create a function for ends input
+# create a function for basic url generation
 pu<-function(endpoint){ 
     # param1 is mod and 2 is end
     ori_url="https://api.nasa.gov/neo/rest/v1"
@@ -43,6 +45,7 @@ pu<-function(endpoint){
   }
 ```
 
+### create a function to ineract with the first endpoint 
 ```{r}
 # create a function to interact with one end point
 mo<-function(apiurl,mod){
@@ -66,10 +69,7 @@ da<-function(endpoint,mod){
 ```{r}
 # function for mod2
 mo2<-function(outputAPI,mod){
-#if(mod==`2023-10-08`){
   outputAPI<-outputAPI$near_earth_objects[noquote(mod)]
-#} 
-
 outputAPI
   
 }
@@ -111,9 +111,94 @@ finalcal(end1 = "feed",mod1 = "2015-09-07",
 ```
 
 ```{r}
-outputAPI<-da("feed","start_date=2015-09-07")
-outputAPI<-mo2(outputAPI,mod="2015-09-08")
-output<-mo3(outputAPI,mod=1.4e12)
+#outputAPI<-da("feed","start_date=2015-09-07")
+#outputAPI<-mo2(outputAPI,mod="2015-09-08")
+#output<-mo3(outputAPI,mod=1.4e12)
 ```
 
+```{r}
+# create a function for second endpoint lookup
+da2<-function(endpoint,mod){
+  mo_new<-function(apiurl,mod){
+  a<-paste(apiurl,mod,sep = "/")
+  a<-paste(a,"api_key=yUhdPcxBc0yGQ0IeWdf1DFPHW31gJLtDL8RAiL0b",sep = "?")
+  a
+  }
+  outputAPI<-fromJSON(mo_new(pu(endpoint),mod))
+  output<-outputAPI$close_approach_data
+  output<-data.frame(matrix(unlist(output),ncol = 11,byrow = FALSE))
+  colnames(output)<-c("close_approach_date", "close_approach_date_full", "epoch_date_close_approach", "relative_velocity.kilometers_per_second","relative_velocity.kilometers_per_hour", "relative_velocity.miles_per_hour", "miss_distance.astronomical",
+                      "miss_distance.lunar", "miss_distance.kilometers", "miss_distance.miles", "orbiting_body")
+  output
+}
+```
 
+```{r}
+# create a function for both endpoints
+both<-function(end1,mod1,mod2,mod3,end2,mod4="none"){
+  n1<-finalcal(end1,mod1 = mod1,mod2 = mod2,mod3 = mod3)
+  n2<-da2(endpoint = end2,mod = mod4)
+  list(n1,n2)
+}
+```
+
+find the ID using this tool for endpoint2: https://ssd.jpl.nasa.gov/tools/sbdb_query.html#!#results
+
+```{r}
+# test the both function
+result<-both(end1 = "feed",mod1 = "2015-09-07",
+         mod2 = "2015-09-08",mod3 = 1.7e12,
+     end2 = "neo",mod4 = 3542517
+     )
+result
+```
+```{r}
+# run the both function again for data used to be compared
+# the question would be finding the difference between different time and different aest
+result2<-both(end1 = "feed",mod1 = "2023-09-07",
+         mod2 = "2023-09-08",mod3 = 1.7e12,
+     end2 = "neo",mod4 = 3542519
+     )
+result2
+```
+
+```{r}
+# since we want to compare them separately, I would combine them into two tables
+summary(result[[1]])
+```
+```{r}
+miss_distance<-result[[1]]%>%
+  summarize("min"=min(miss_distance.astronomical),
+            "max"=max(miss_distance.astronomical))
+knitr::kable(miss_distance,caption="example")
+
+```
+
+```{r}
+data_2015<-result[[1]]
+data_2023<-result2[[1]]
+num_1<-result[[2]]
+num_2<-result2[[2]]
+```
+
+```{r}
+data_together<-rbind(data_2015,data_2023)
+```
+
+```{r}
+str(data_together)
+```
+```{r}
+# plot1
+plot1<-ggplot(data_together,aes(x=close_approach_date))
+plot1+geom_boxplot(aes(y=relative_velocity.kilometers_per_second))
+plot1+geom_boxplot(aes(y=as.numeric(miss_distance.lunar)))
+```
+
+```{r}
+num_1$epoch_date_close_approach<-as.numeric(num_1$epoch_date_close_approach)
+num_1$relative_velocity.kilometers_per_second<-as.numeric(num_1$relative_velocity.kilometers_per_second)
+# plot 2
+plot2<-ggplot(num_1,aes(x=close_approach_date,y=epoch_date_close_approach))
+plot2+geom_col()
+```
