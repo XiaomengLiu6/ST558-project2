@@ -3,7 +3,6 @@ title: "project2"
 author: "Xiaomeng Liu"
 date: "2023-10-04"
 output: github_document
-        #rmarkdown::render(README.md)
 ---
 
 ```{r setup, include=FALSE}
@@ -17,3 +16,104 @@ query, parse, and return well-structured data. You’ll then use your functions 
 do some exploratory data analysis. This is an individual project and your work will be done in a github repo.
 
 # Setting up your Github Repo
+
+
+# Vignette Content Details
+
+## write functions to contact your chosen API and return 
+
+```{r}
+library(tidyverse) ; library(httr) ; library(jsonlite)
+```
+
+## Fucntions to interact with the API
+
+```{r}
+# create a function for ends input
+pu<-function(endpoint){ 
+    # param1 is mod and 2 is end
+    ori_url="https://api.nasa.gov/neo/rest/v1"
+  apiurl<-paste(ori_url,endpoint,sep = "/")
+  
+  lastchar<-substr(apiurl,nchar(apiurl),nchar(apiurl))
+  if(lastchar=="?"|lastchar=="/"){
+    apiurl<-substr(apiurl,1,nchar(apiurl)-1)
+  }
+  apiurl
+  }
+```
+
+```{r}
+# create a function to interact with one end point
+mo<-function(apiurl,mod){
+  dat<-paste0("start_date=",mod)
+  a<-paste(apiurl,dat,sep = "?")
+  a<-paste(a,"api_key=yUhdPcxBc0yGQ0IeWdf1DFPHW31gJLtDL8RAiL0b",sep = "&")
+  a
+}
+```
+
+```{r}
+# create a function to draw it from API
+da<-function(endpoint,mod){
+  outputAPI<-fromJSON(mo(pu(endpoint),mod))
+  outputAPI
+}
+```
+
+
+
+```{r}
+# function for mod2
+mo2<-function(outputAPI,mod){
+#if(mod==`2023-10-08`){
+  outputAPI<-outputAPI$near_earth_objects[noquote(mod)]
+#} 
+
+outputAPI
+  
+}
+
+# function for mod3
+mo3<-function(outputAPI,mod){
+  ifelse(is.null(mod),print("missing value"),
+         output<-outputAPI[[1]]$close_approach_data)
+  output<-data.frame(matrix(unlist(output),nrow=length(output),byrow = TRUE))
+  colnames(output)<-c("close_approach_date", "close_approach_date_full", "epoch_date_close_approach", "relative_velocity.kilometers_per_second","relative_velocity.kilometers_per_hour", "relative_velocity.miles_per_hour", "miss_distance.astronomical",
+                      "miss_distance.lunar", "miss_distance.kilometers", "miss_distance.miles", "orbiting_body")
+  output$epoch_date_close_approach<-as.numeric(output$epoch_date_close_approach)
+  ifelse(mod<max(output$epoch_date_close_approach),
+  output<-output%>% filter(epoch_date_close_approach > mod),
+  print("too large for the epoch date close approach"))
+  # a warning message will be shown and the filter will not be applied
+  output # output the result anyway
+}
+```
+
+```{r}
+# define the function for all the end point and mods
+# mod1 and mod4 are for the start_data which could be empty as default
+# mod2 would be `is_potentially_hazardous_asteroid`
+# mod3 would be `close_approach_data$epoch_date_close_approach`
+finalcal<-function(end1,mod1="none",mod2,mod3){
+  # for end1
+  outputAPI<-da(endpoint=end1,mod1)
+  outputAPI<-mo2(outputAPI,mod2)
+  output<-mo3(outputAPI,mod3)
+  output
+}
+```
+
+```{r}
+# do a test
+finalcal(end1 = "feed",mod1 = "2015-09-07",
+         mod2 = "2015-09-08",mod3 = 1.7e12)
+```
+
+```{r}
+outputAPI<-da("feed","start_date=2015-09-07")
+outputAPI<-mo2(outputAPI,mod="2015-09-08")
+output<-mo3(outputAPI,mod=1.4e12)
+```
+
+

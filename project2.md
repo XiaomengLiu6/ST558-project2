@@ -3,33 +3,47 @@ project2
 Xiaomeng Liu
 2023-10-04
 
-## R Markdown
+# overall goal 
 
-This is an R Markdown document. Markdown is a simple formatting syntax
-for authoring HTML, PDF, and MS Word documents. For more details on
-using R Markdown see <http://rmarkdown.rstudio.com>.
+Our goal with this project is to create a vignette about contacting an
+API using functions you’ve created to query, parse, and return
+well-structured data. You’ll then use your functions to obtain data from
+the API and do some exploratory data analysis. This is an individual
+project and your work will be done in a github repo.
 
-When you click the **Knit** button a document will be generated that
-includes both content as well as the output of any embedded R code
-chunks within the document. You can embed an R code chunk like this:
+# Setting up your Github Repo
+
+# Vignette Content Details
+
+## write functions to contact your chosen API and return
 
 ``` r
-summary(cars)
+#,mod2,mod3,
+my_query<-function(end1,mod1,end2,mod4){
+  #contact your chosen API and return
+  if(is.null(mod1)){
+    apiurl1<-paste("https://github.com/public-apis/public-apis.git",end1,sep = "/")
+  }
+  else{
+    apiurl1<-paste("https://github.com/public-apis/public-apis.git",mod1,end1,sep = "/")
+  }
+  lastchar1<-substr(apiurl1,nchar(apiurl1),nchar(apiurl1))
+  if(lastchar1=="?"|lastchar1=="/"){
+    apiurl1<-substr(apiurl,1,nchar(apiurl1)-1)
+  }
+  
+    if(is.null(mod4)){
+    apiurl2<-paste("https://github.com/public-apis/public-apis.git",end2,sep = "/")
+  }
+  else{
+    apiurl2<-paste("https://github.com/public-apis/public-apis.git",mod4,end2,sep = "/")
+  }
+  lastchar2<-substr(apiurl2,nchar(apiurl2),nchar(apiurl2))
+  if(lastchar2=="?"|lastchar2=="/"){
+    apiurl2<-substr(apiur2,1,nchar(apiurl2)-1)
+  }
+  
+  
+  list(apiurl1,apiurl2)
+}
 ```
-
-    ##      speed           dist       
-    ##  Min.   : 4.0   Min.   :  2.00  
-    ##  1st Qu.:12.0   1st Qu.: 26.00  
-    ##  Median :15.0   Median : 36.00  
-    ##  Mean   :15.4   Mean   : 42.98  
-    ##  3rd Qu.:19.0   3rd Qu.: 56.00  
-    ##  Max.   :25.0   Max.   :120.00
-
-## Including Plots
-
-You can also embed plots, for example:
-
-![](project2_files/figure-gfm/pressure-1.png)<!-- -->
-
-Note that the `echo = FALSE` parameter was added to the code chunk to
-prevent printing of the R code that generated the plot.
