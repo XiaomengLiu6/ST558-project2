@@ -189,7 +189,7 @@ data_together<-rbind(data_2015,data_2023)
 str(data_together)
 ```
 ```{r}
-# plot1
+# plot1 boxplot for 2 vars for first data
 plot1<-ggplot(data_together,aes(x=close_approach_date))
 plot1+geom_boxplot(aes(y=relative_velocity.kilometers_per_second))
 plot1+geom_boxplot(aes(y=as.numeric(miss_distance.lunar)))
@@ -199,6 +199,18 @@ plot1+geom_boxplot(aes(y=as.numeric(miss_distance.lunar)))
 num_1$epoch_date_close_approach<-as.numeric(num_1$epoch_date_close_approach)
 num_1$relative_velocity.kilometers_per_second<-as.numeric(num_1$relative_velocity.kilometers_per_second)
 # plot 2
-plot2<-ggplot(num_1,aes(x=close_approach_date,y=epoch_date_close_approach))
-plot2+geom_col()
+plot2<-ggplot(num_1)
+plot2+geom_col(aes(x=close_approach_date,y=epoch_date_close_approach))
+plot2+geom_tile(aes(x=relative_velocity.kilometers_per_second,y=epoch_date_close_approach,fill=close_approach_date))
+```
+
+
+```{r}
+# num1
+num_1<-num_1%>%mutate(number=1)
+num_2<-num_2%>%mutate(number=2)
+num<-rbind(num_1,num_2)
+num$epoch_date_close_approach<-as.numeric(num$epoch_date_close_approach)
+plot3<-ggplot(num)
+plot3+geom_tile(aes(x=close_approach_date,y=epoch_date_close_approach,fill=number))
 ```
