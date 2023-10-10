@@ -3,6 +3,44 @@ Project2–NASA API
 Xiaomeng Liu
 2023-10-08
 
+- [Goal](#goal)
+- [library](#library)
+- [setting up Github Repo](#setting-up-github-repo)
+- [Vignette Content Details](#vignette-content-details)
+  - [endpoint 1](#endpoint-1)
+    - [create a function for basic url
+      generation](#create-a-function-for-basic-url-generation)
+    - [create a function for url with modifications for endpoint 1  
+      ](#create-a-function-for-url-with-modifications-for-endpoint-1-)
+    - [create a function to draw the final URL from
+      API](#create-a-function-to-draw-the-final-url-from-api)
+  - [endpoint 2](#endpoint-2)
+    - [create a function for basic url
+      generation](#create-a-function-for-basic-url-generation-1)
+    - [create a function to ineract with the second
+      endpoint](#create-a-function-to-ineract-with-the-second-endpoint)
+    - [create a function to draw the final URL from
+      API](#create-a-function-to-draw-the-final-url-from-api-1)
+  - [both endpoint](#both-endpoint)
+    - [define the function for all the endpoint and
+      mods](#define-the-function-for-all-the-endpoint-and-mods)
+    - [test run and first run](#test-run-and-first-run)
+    - [second run](#second-run)
+- [data evaluation step](#data-evaluation-step)
+  - [Question:](#question)
+  - [Handling the CME data](#handling-the-cme-data)
+    - [numerical summary for CME data](#numerical-summary-for-cme-data)
+    - [create scatter plot to see the
+      difference](#create-scatter-plot-to-see-the-difference)
+    - [draw a correlogram](#draw-a-correlogram)
+  - [Handling the asteroids data](#handling-the-asteroids-data)
+    - [draw contingency tables](#draw-contingency-tables)
+    - [draw histogram and boxplot for data
+      analysis](#draw-histogram-and-boxplot-for-data-analysis)
+    - [draw histogram and box plot for the distance
+      varible](#draw-histogram-and-box-plot-for-the-distance-varible)
+- [Conclusion](#conclusion)
+
 # Goal
 
 Our goal with this project is to create a vignette about contacting an
@@ -13,10 +51,10 @@ project and your work will be done in a github repo.
 
 # library
 
-Three libraries are included: tidyverse, httr and jsonlite
+Three libraries are included: tidyverse, httr,ggcorrplot and jsonlite
 
 ``` r
-library(tidyverse) ; library(httr) ; library(jsonlite)
+library(tidyverse) ; library(httr) ; library(jsonlite); library(ggcorrplot) # for correlation plot
 ```
 
     ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
@@ -309,7 +347,7 @@ knitr::kable(plot1,caption = "check the difference for CME latitude between 2015
 | year/latitude | min | max |  mean | std.dev |
 |:--------------|----:|----:|------:|--------:|
 | 2015          | -55 |  90 | 2.838 |  36.394 |
-| 2023          | -64 |  58 | 1.672 |  26.280 |
+| 2023          | -64 |  83 | 3.620 |  27.625 |
 
 check the difference for CME latitude between 2015 and 2023
 
@@ -335,7 +373,7 @@ knitr::kable(plot1,caption = "check the difference for CME latitude between 2015
 | year/latitude | min | max |  mean | std.dev |
 |:--------------|----:|----:|------:|--------:|
 | 2015          | -55 |  90 | 2.435 |  42.275 |
-| 2023          | -41 |  58 | 2.789 |  25.276 |
+| 2023          | -41 |  58 | 3.975 |  25.275 |
 
 check the difference for CME latitude between 2015 and 2023 with type S
 
@@ -358,10 +396,10 @@ plot1<-rbind(la1,la2)
 knitr::kable(plot1,caption = "check the difference for CME latitude between 2015 and 2023 with type O",digits = 3)
 ```
 
-| year/latitude | min | max | mean | std.dev |
-|:--------------|----:|----:|-----:|--------:|
-| 2015          | -23 | -23 |  -23 |      NA |
-| 2023          |   8 |  36 |   19 |  12.329 |
+| year/latitude | min | max |    mean | std.dev |
+|:--------------|----:|----:|--------:|--------:|
+| 2015          | -23 | -23 | -23.000 |      NA |
+| 2023          |   8 |  36 |  17.333 |  11.759 |
 
 check the difference for CME latitude between 2015 and 2023 with type O
 
@@ -387,7 +425,7 @@ knitr::kable(plot1,caption = "check the difference for CME latitude between 2015
 | year/latitude | min | max |   mean | std.dev |
 |:--------------|----:|----:|-------:|--------:|
 | 2015          | -26 |  59 |  5.538 |  25.165 |
-| 2023          | -64 |  37 | -3.708 |  28.810 |
+| 2023          | -64 |  83 | -0.240 |  33.109 |
 
 check the difference for CME latitude between 2015 and 2023 with type C
 
@@ -415,7 +453,7 @@ knitr::kable(plot1,caption = "check the difference for CME longitude between 201
 | year/longitude |  min | max |    mean | std.dev |
 |:---------------|-----:|----:|--------:|--------:|
 | 2015           | -178 | 166 | -13.541 |  92.665 |
-| 2023           | -175 | 174 | -18.716 |  83.621 |
+| 2023           | -175 | 174 | -24.000 |  84.706 |
 
 check the difference for CME longitude between 2015 and 2023
 
@@ -428,6 +466,9 @@ The spread for both latitude and longitude is included in these two
 plots.
 
 ``` r
+# change the time variables to a sequence to make it clearer
+CME1$time21_5<-seq(1:length(CME1$time21_5))
+CME2$time21_5<-seq(1:length(CME2$time21_5))
 # the first plot is for the 2015 data
 plot4<-ggplot(data = CME1,aes(x=time21_5,y=latitude))
 plot4+
@@ -450,30 +491,47 @@ plot5+
 
 ![](new_files/figure-gfm/unnamed-chunk-16-2.png)<!-- -->
 
-The x variable time here is having a long value for each observation but
-the exact values are not important here, so we could ignore the time
-values. The most direct thing here is that 2023 is having more
+The x variable time shows all the observations we collect through the
+whole year. The most direct thing here is that 2023 is having more
 observations than 2015. Also, we could tell that the latitude is having
 less variability but the longitude is having more variability.  
 
-### draw a heatmap
+### draw a correlogram
 
-A heatmap of half angle and speed is drawn to look for potential
+A correlogram of all numerical variables is drawn to look for potential
 difference.  
 
 ``` r
-# draw a heat map
-plot6<-ggplot(data = CME,aes(x=halfAngle,y=speed,fill=year)) #set x and y 
-plot6+geom_tile()+ # do the heat map
-  labs(title = "heatmap for speed and half angle")
+# change the time varaible to more readable
+CME$time21_5<-seq(1:length(CME$time21_5))
+# draw a correlogram for correlations 
+# I found it on this page: https://r-statistics.co/Top50-Ggplot2-Visualizations-MasterList-R-Code.html#Correlogram
+corr1<-cor(CME1[2:5])
+ggcorrplot(corr1,hc.order = TRUE,
+           lab=TRUE,type = "lower",
+           ggtheme = theme_bw)
 ```
 
 ![](new_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
-Even though we only have a few data points, we could tell that the range
-for both speed and halfAngle is wider in 2023 than 2015. From the 2023
-data, there could be a possible correlation but the 2015 data does not
-show anything about it.  
+``` r
+# draw 2 for comparison
+corr2<-cor(CME2[2:5])
+ggcorrplot(corr2,hc.order = TRUE,
+           lab=TRUE,type = "lower",
+           ggtheme = theme_bw)
+```
+
+![](new_files/figure-gfm/unnamed-chunk-17-2.png)<!-- -->
+
+There some minor differences between correlation for 2015 and 2023. The
+correlation between speed and halfAngle is increased and becoming more
+significant. Since 2023 has more observation, we might need to collect
+more data to prove whether there will be a strong correlation between
+them. 2023 is doing better than 2015.Similarly, the corr between
+longitude and latitude is getting less significant. If we just look at
+one of the data, we may make different decision about whether there is a
+correlation.  
 
 ## Handling the asteroids data
 
@@ -631,3 +689,22 @@ plot3+geom_boxplot(aes(y=miss_distance.kilometers,fill=close_approach_date))+
 The plots here is showing different result as the velocity. It shows
 that miss distance in 2015 is slightly higher than the one in 2023. Most
 of them fit in the same place and the ranges are roughly same.  
+
+# Conclusion
+
+This is the last part of this project. Based on the graph and plots
+generated above, the difference between 2015 and 2023 exists. It shows
+that there are some improvement on the CME data collection so the new
+data is wider and covering more possible values in the universe. The
+asteroids data is showing less difference since all the asteroids are in
+the sky. The development is not showing much difference for the
+observations, but the accuracy of the observation is increased since our
+miss distance is decreased.
+
+This proves that our 2023 data is generally better than the previous
+data and NASA’s development is influencing our analysis about the
+universe but there is not a big gap on the things we found. I tried to
+save as much data as possible before the evaluation step in case anyone
+might do more analysis with it.
+
+Thanks for reading this.

@@ -2,7 +2,11 @@
 title: "Project2--NASA API"
 author: "Xiaomeng Liu"
 date: "2023-10-08"
-output: github_document
+output: 
+  github_document:
+    toc: true
+    toc_depth: 3
+    number_sections: false
 ---
 
 ```{r setup, include=FALSE}
@@ -16,10 +20,10 @@ do some exploratory data analysis. This is an individual project and your work w
 
 # library
 
-Three libraries are included: tidyverse, httr and jsonlite
+Three libraries are included: tidyverse, httr,ggcorrplot and jsonlite
 
 ```{r}
-library(tidyverse) ; library(httr) ; library(jsonlite)
+library(tidyverse) ; library(httr) ; library(jsonlite); library(ggcorrplot) # for correlation plot
 ```
 
 # setting up Github Repo
@@ -329,6 +333,9 @@ The difference here is not very clear and not much useful info here, so I will p
 The spread for both latitude and longitude is included in these two plots. 
 
 ```{r}
+# change the time variables to a sequence to make it clearer
+CME1$time21_5<-seq(1:length(CME1$time21_5))
+CME2$time21_5<-seq(1:length(CME2$time21_5))
 # the first plot is for the 2015 data
 plot4<-ggplot(data = CME1,aes(x=time21_5,y=latitude))
 plot4+
@@ -345,20 +352,29 @@ plot5+
   labs(title = "2023 latitude and longitude scatter plot",x="time",y="latitude and longitude")
 ```
 
-The x variable time here is having a long value for each observation but the exact values are not important here, so we could ignore the time values. The most direct thing here is that 2023 is having more observations than 2015. Also, we could tell that the latitude is having less variability but the longitude is having more variability.\
+The x variable time shows all the observations we collect through the whole year. The most direct thing here is that 2023 is having more observations than 2015. Also, we could tell that the latitude is having less variability but the longitude is having more variability.\
 
-### draw a heatmap
+### draw a correlogram
 
-A heatmap of half angle and speed is drawn to look for potential difference.\
+A correlogram of all numerical variables is drawn to look for potential difference.\
 
 ```{r}
-# draw a heat map
-plot6<-ggplot(data = CME,aes(x=halfAngle,y=speed,fill=year)) #set x and y 
-plot6+geom_tile()+ # do the heat map
-  labs(title = "heatmap for speed and half angle")
+# change the time varaible to more readable
+CME$time21_5<-seq(1:length(CME$time21_5))
+# draw a correlogram for correlations 
+# I found it on this page: https://r-statistics.co/Top50-Ggplot2-Visualizations-MasterList-R-Code.html#Correlogram
+corr1<-cor(CME1[2:5])
+ggcorrplot(corr1,hc.order = TRUE,
+           lab=TRUE,type = "lower",
+           ggtheme = theme_bw)
+# draw 2 for comparison
+corr2<-cor(CME2[2:5])
+ggcorrplot(corr2,hc.order = TRUE,
+           lab=TRUE,type = "lower",
+           ggtheme = theme_bw)
 ```
 
-Even though we only have a few data points, we could tell that the range for both speed and halfAngle is wider in 2023 than 2015. From the 2023 data, there could be a possible correlation but the 2015 data does not show anything about it.\
+There some minor differences between correlation for 2015 and 2023. The correlation between speed and halfAngle is increased and becoming more significant. Since 2023 has more observation, we might need to collect more data to prove whether there will be a strong correlation between them. 2023 is doing better than 2015.Similarly, the corr between longitude and latitude is getting less significant. If we just look at one of the data, we may make different decision about whether there is a correlation. \
 
 
 ## Handling the asteroids data
